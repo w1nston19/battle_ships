@@ -3,10 +3,10 @@
 //
 using namespace std;
 struct player{
-    int board[10][10];
-    int guessesBoard[10][10];
-    int all_ships=10, small_ships=4,middle_ships=3,big_ships=2,huge_ship=1;
-    int found_all_ships=0,found_small_ships=0,found_middle_ships=0,found_big_ships=0,found_huge_ship=0;
+    int board[10][10]{};
+    int guessesBoard[10][10]{};
+    int allShips=10, smallShips=4,middleShips=3,bigShips=2,hugeShip=1;
+    int found_allShips=0,found_smallShips=0,found_middleShips=0,found_bigShips=0,found_hugeShip=0;
     int destroyed_ships=0;
     player()
     {
@@ -20,7 +20,7 @@ struct player{
         }
     }
 };
-void print_line()
+void printLine()
 {
     char ch=(char)196;
     for(int i=0;i<11;i++)
@@ -29,17 +29,17 @@ void print_line()
     }
     cout<<endl;
 }
-void print_board(int a[10][10])
+void printBoard(int a[10][10])
 {
     system("cls");
-    print_line();
+    printLine();
     cout<<"|   |";
     for(int i=65;i<=74;i++)
     {
         cout<<" "<<(char)i<<" |";
     }
     cout<<endl;
-    print_line();
+    printLine();
     for(int i=0;i<10;i++)
     {
         if(i<9)
@@ -55,11 +55,11 @@ void print_board(int a[10][10])
 
         }
         cout<<endl;
-        print_line();
+        printLine();
     }
 }
-int ship_size(int type)
-{
+int shipSize(int type)
+{   //returns the size of the ship depending on its type
     int size_ship;
     switch (type)
     {
@@ -70,16 +70,129 @@ int ship_size(int type)
     }
     return size_ship;
 }
-void place_a_ship(int a[10][10],int type, int first_coordinate, int second_coordinate,int direction)
-{
-    int size_ship=ship_size(type);
+void placeShip(int a[10][10],int type, int first_coordinate, int second_coordinate,int direction)
+{   //places a ship on the board
     switch(direction)
     {
-        case 1:for(int i=0;i<size_ship;i++){a[first_coordinate-i][second_coordinate]=type;};break; //up
-        case 2:for(int i=0;i<size_ship;i++){a[first_coordinate+i][second_coordinate]=type;};break;//down
-        case 3:for(int i=0;i<size_ship;i++){a[first_coordinate][second_coordinate-i]=type;};break;//left
-        case 4:for(int i=0;i<size_ship;i++){a[first_coordinate][second_coordinate+i]=type;};break;//right
+        case 1:for(int i=0;i<shipSize(type);i++){a[first_coordinate-i][second_coordinate]=type;};break; //up
+        case 2:for(int i=0;i<shipSize(type);i++){a[first_coordinate+i][second_coordinate]=type;};break;//down
+        case 3:for(int i=0;i<shipSize(type);i++){a[first_coordinate][second_coordinate-i]=type;};break;//left
+        case 4:for(int i=0;i<shipSize(type);i++){a[first_coordinate][second_coordinate+i]=type;};break;//right
+        default:return;
     }
+}
+bool areThereAny(player pl,int type) //checks if the player has any ships left from the type
+{
+    int number_left;
+    switch(type)
+    {
+        case 1:number_left=pl.smallShips;break;
+        case 2:number_left=pl.middleShips;break;
+        case 3:number_left=pl.bigShips;break;
+        case 4:number_left=pl.hugeShip;break;
+    }
+    return number_left>0;
+}
+bool isInit(int i,int j) // checks if the element on i,j position is inside the board
+{
+    return i>=0&&i<=9&&j>=0&&j<=9;
+}
+bool coordinatesValidation(int arr[10][10],int firstCoordinate,int secondCoordinate)
+{   //checks if the element arr[firstCoordinate][secondCoordinate] is not too close to other ships
+    for(int i=firstCoordinate-1;i<=firstCoordinate+1;i++)
+    {
+        for(int j=secondCoordinate-1;j<=secondCoordinate+1;j++)
+        {
+            if(arr[i][j]>=1&&arr[i][j]<=4&&isInit(i,j)) return false;
+        }
+    }
+    return true;
+}
+bool isAvailable(int arr[10][10],int type,int firstCoordinate, int secondCoordinate,int direction)
+{   //checks if a the input ship can be placed on the board
+    // (is not outside and is not close to other ships)
+    switch(direction)
+    {
+        case 1:for(int i=0;i<shipSize(type);i++)
+        {if(!coordinatesValidation(arr,firstCoordinate-i,secondCoordinate))return false;}
+        return true;break;
+        case 2:for(int i=0;i<shipSize(type);i++)
+        {if(!coordinatesValidation(arr,firstCoordinate+i,secondCoordinate))return false;}
+        return true;break;
+        case 3:for(int i=0;i<shipSize(type);i++)
+        {if(!coordinatesValidation(arr,firstCoordinate,secondCoordinate-i))return false;}
+        return true;break;
+        case 4:for(int i=0;i<shipSize(type);i++)
+        {if(!coordinatesValidation(arr,firstCoordinate,secondCoordinate+i))return false;}
+        return true;break;
+        default:return false;
+    }
+}
+bool isNotOutOfBounds(int type,int firstCoordinate,int secondCoordinate,int direction)
+{   //checks if the ship is not being placed outside the board
+    int size=shipSize(type);
+    switch(direction)
+    {
+        case 1:return (firstCoordinate-size+1)>=0;
+        case 2:return (firstCoordinate+size-1)<=9;
+        case 3:return (secondCoordinate-size+1)>=0;
+        case 4:return (secondCoordinate+size-1)<=9;
+        default:return false;
+    }
+}
+int reworkCoordinate(char letterCoordinate)
+{   //reworks the letter coordinate to number
+    int numberCoordinate;
+    if(letterCoordinate>='a'&&letterCoordinate<='z')
+    {
+        letterCoordinate-=32;
+    }
+    numberCoordinate=(int)letterCoordinate-65;
+    return numberCoordinate;
+}
+void placeAllShips(player &playerX)
+{   //places all 10 ships on the board
+    int type,firstCoordinate,secondCoordinate,direction;
+    char letterCoordinate;
+    do {
+        do {
+            cout << "Enter the type of your ship : " << endl;
+            do {
+                cout<<"*"<<endl;
+                cin >> type;
+                cout<<areThereAny(playerX,type)<<endl;
+            } while (type < 1 || type > 4 || !areThereAny(playerX, type));
+            cout << "Choose starting point " << endl;
+            do {
+                cin >> letterCoordinate;
+                cin >> firstCoordinate;
+            } while (!isalpha(letterCoordinate) || firstCoordinate < 1 || firstCoordinate > 10);
+            cout << "Enter direction" << endl;
+            do {
+                cin >> direction;
+            } while (direction < 1 || direction > 4);
+            secondCoordinate = reworkCoordinate(letterCoordinate);
+            firstCoordinate--;
+        } while (!isAvailable(playerX.board, type, firstCoordinate, secondCoordinate, direction) ||
+                 !isNotOutOfBounds(type, firstCoordinate, secondCoordinate, direction));
+        placeShip(playerX.board, type, firstCoordinate, secondCoordinate, direction);
+        switch (type) {
+            case 1:
+                playerX.smallShips--;
+                break;
+            case 2:
+                playerX.middleShips--;
+                break;
+            case 3:
+                playerX.bigShips--;
+                break;
+            case 4:
+                playerX.hugeShip--;
+                break;
+        }
+        playerX.allShips--;
+        printBoard(playerX.board);
+    }while(playerX.allShips>0);
 }
 #ifndef BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
 #define BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
