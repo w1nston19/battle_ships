@@ -1,9 +1,11 @@
 #include <iostream>
+#include "battleShipsFunctions.h"
 using namespace std;
 int main()
 {
-    cout<<"tryGit1"<<endl;
-
+    player playerOne,playerTwo;
+    cout<<"Welcome to the game of battle ships!"<<endl;
+    system("pause");
     return 0;
 }
 
