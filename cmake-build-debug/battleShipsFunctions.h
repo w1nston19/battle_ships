@@ -58,6 +58,29 @@ void print_board(int a[10][10])
         print_line();
     }
 }
+int ship_size(int type)
+{
+    int size_ship;
+    switch (type)
+    {
+        case 1:size_ship=2;break;
+        case 2:size_ship=3;break;
+        case 3:size_ship=4;break;
+        case 4:size_ship=6;break;
+    }
+    return size_ship;
+}
+void place_a_ship(int a[10][10],int type, int first_coordinate, int second_coordinate,int direction)
+{
+    int size_ship=ship_size(type);
+    switch(direction)
+    {
+        case 1:for(int i=0;i<size_ship;i++){a[first_coordinate-i][second_coordinate]=type;};break; //up
+        case 2:for(int i=0;i<size_ship;i++){a[first_coordinate+i][second_coordinate]=type;};break;//down
+        case 3:for(int i=0;i<size_ship;i++){a[first_coordinate][second_coordinate-i]=type;};break;//left
+        case 4:for(int i=0;i<size_ship;i++){a[first_coordinate][second_coordinate+i]=type;};break;//right
+    }
+}
 #ifndef BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
 #define BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
 
