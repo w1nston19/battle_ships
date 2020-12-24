@@ -3,10 +3,10 @@
 //
 using namespace std;
 struct player{
-    int board[10][10]{};
-    int guessesBoard[10][10]{};
+    int board[10][10];
+    int guessesBoard[10][10];
     int allShips=10, smallShips=4,middleShips=3,bigShips=2,hugeShip=1;
-    int found_allShips=0,found_smallShips=0,found_middleShips=0,found_bigShips=0,found_hugeShip=0;
+    int foundAllShips=0,foundSmallShips=0,foundMiddleShips=0,foundBigShips=0,foundHugeShip=0;
     int destroyed_ships=0;
     player()
     {
@@ -58,6 +58,35 @@ void printBoard(int a[10][10])
         printLine();
     }
 }
+void printGuessesBoard(int a[10][10])
+{
+    printLine();
+    cout<<"|   |";
+    for(int i=65;i<=74;i++)
+    {
+        cout<<" "<<(char)i<<" |";
+    }
+    cout<<endl;
+    printLine();
+    for(int i=0;i<10;i++)
+    {
+        if(i<9)
+        {
+            cout<<"| "<<i+1<<" |";
+        }
+        else {cout<<"|"<<i+1<<" |";}
+
+        for(int j=0;j<10;j++)
+        {
+            if(a[i][j]==0){cout<<" "<<" "<<" |";}//places that havent been guessed
+            if(a[i][j]==1){cout<<" "<<"Y"<<" |";}//correct guessed places
+            if(a[i][j]==2){cout<<" "<<"X"<<" |";}//wrong guessed places
+        }
+        cout<<endl;
+        printLine();
+
+    }
+}
 int shipSize(int type)
 {   //returns the size of the ship depending on its type
     int size_ship;
@@ -81,15 +110,15 @@ void placeShip(int a[10][10],int type, int first_coordinate, int second_coordina
         default:return;
     }
 }
-bool areThereAny(player pl,int type) //checks if the player has any ships left from the type
+bool areThereAny(player playerX,int type) //checks if the player has any ships left from the type
 {
     int number_left;
     switch(type)
     {
-        case 1:number_left=pl.smallShips;break;
-        case 2:number_left=pl.middleShips;break;
-        case 3:number_left=pl.bigShips;break;
-        case 4:number_left=pl.hugeShip;break;
+        case 1:number_left=playerX.smallShips;break;
+        case 2:number_left=playerX.middleShips;break;
+        case 3:number_left=playerX.bigShips;break;
+        case 4:number_left=playerX.hugeShip;break;
     }
     return number_left>0;
 }
@@ -158,9 +187,7 @@ void placeAllShips(player &playerX)
         do {
             cout << "Enter the type of your ship : " << endl;
             do {
-                cout<<"*"<<endl;
                 cin >> type;
-                cout<<areThereAny(playerX,type)<<endl;
             } while (type < 1 || type > 4 || !areThereAny(playerX, type));
             cout << "Choose starting point " << endl;
             do {
@@ -193,6 +220,33 @@ void placeAllShips(player &playerX)
         playerX.allShips--;
         printBoard(playerX.board);
     }while(playerX.allShips>0);
+}
+void seeGuessedShips(player &playerX)
+{
+    printGuessesBoard(playerX.guessesBoard);
+    cout<<"Guessed ships - "<<playerX.foundAllShips<<endl;
+    cout<<"Small ships - "<<playerX.foundSmallShips<<endl;
+    cout<<"Middle ships - "<<playerX.foundMiddleShips<<endl;
+    cout<<"Big ships - "<<playerX.foundBigShips<<endl;
+    cout<<"Huge ships - "<<playerX.foundHugeShip<<endl;
+}
+
+void turn(player &playerOne,player &playerTwo)
+{
+    int choice;
+    cout<<"What would you like to do?"<<endl;
+    cout<<"1-See already guessed ships and coordinates(not available if you haven't guessed yet"<<endl;
+    cout<<"2-Guess by entering coordinates"<<endl;
+    cout<<"3-Guess by moving by one square up/down/left/right from you last guess"<<endl;
+    do{
+        cin>>choice;
+    }while(choice<1||choice>3);
+    switch(choice)
+    {
+        case 1:seeGuessedShips(playerOne);break;
+        case 2: ;break;
+        case 3: ;break;
+    }
 }
 #ifndef BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
 #define BATTLE_SHIPS_BATTLESHIPSFUNCTIONS_H
